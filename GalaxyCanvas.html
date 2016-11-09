@@ -1,0 +1,110 @@
+<html>
+<head>
+<style>
+</style>
+</head>
+<body style="margin:0px;">
+
+<div id="SpaceView">
+<canvas id="canvas-SpaceView"></canvas>
+</div>
+
+</body>
+
+<script>
+	"use strict";
+	
+	var CANVAS_WIDTH = window.innerWidth;
+	var CANVAS_HEIGHT = window.innerHeight;
+	
+	var element = document.getElementById("canvas-SpaceView");
+	element.width = CANVAS_WIDTH;
+	element.height = CANVAS_HEIGHT;
+
+var stars = Array();
+var i=0;
+var X_MAX = 75;//300;
+var Y_MAX = X_MAX;
+var Z_MAX = X_MAX/10;
+for (var x=0; x<X_MAX; ++x) {
+	for (var y=0; y<Y_MAX; ++y) {
+		var dx = x - (X_MAX/2);
+		var dy = y - (Y_MAX/2);
+		var theta = Math.atan(dx/dy);
+		var h = Math.sqrt( dx*dx + dy*dy );
+		var fraction = h/(X_MAX/2);
+		var modified_theta = 4*theta + h/(0.05*X_MAX);
+		var thickness = (1+Math.cos(modified_theta))/2;
+		thickness = falloff(thickness, fraction);
+		console.log(thickness);
+		for (var z=-thickness/2; z<thickness/2; z+=0.05) {
+			var starTemp = 2*(Math.random()-0.5);
+			
+			var star = {
+				red: Math.floor(256-(56*starTemp)),
+				blue: Math.floor(200+(56*starTemp)),
+				alpha: 0.2*Math.abs(thickness)*Math.random(),
+				
+				x: dx + Math.random(),
+				y: dy + Math.random(),
+				z: z*Z_MAX + Math.random(),
+			};
+			stars[i] = star;
+			i++;
+		}
+	}
+}
+
+function falloff(thickness, fraction) {
+	var thickness_1 = thickness * Math.sin(1-fraction);
+	var bluge_relative_size = 0.6;
+	var thickness_2 = fraction>bluge_relative_size? 0: 1-(fraction/bluge_relative_size);
+	return Math.max(thickness_1, thickness_2);
+}
+
+var SCALE = 8;
+function renderSpaceView() {
+	var time = Date.now()/-10000;
+	var example = document.getElementById('canvas-SpaceView');
+	var context = example.getContext('2d');
+	// Void
+	context.beginPath();
+	context.fillStyle = 'black';
+	context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	context.stroke();
+	// Stars
+	context.beginPath();
+	var DX = CANVAS_WIDTH / 2, DY = CANVAS_HEIGHT / 2;
+	for (var starIndex in stars) {
+		star = stars[starIndex];
+		context.fillStyle = "rgba("+star.red+", 255, "+star.blue+", "+star.alpha+/**/")";
+		var sx, sy;
+		sx = star.x*Math.sin(time) + star.y*Math.cos(time);
+		sy = star.x*Math.cos(time) - star.y*Math.sin(time);
+		var tx, ty, tilt = -Math.PI/2 + 0.3 + 0.1*Math.sin(time*5);
+		tx = sx;//sx*Math.sin(tilt) + star.z*Math.cos(tilt);
+		ty = sy*Math.cos(tilt) - star.z*Math.sin(tilt);
+		context.fillRect(SCALE * tx + DX, SCALE * ty + DY, SCALE/2, SCALE/2);
+	}
+	context.stroke();
+	
+	window.setTimeout(timeoutTest, 1000/60);
+}
+
+function renderPolygon(context, polygon) {
+	context.moveTo(sx+polygon[0], sy+polygon[1]);
+	for (var i=2; i<polygon.length-1; i+=2) {
+		context.lineTo(sx+polygon[i], sy+polygon[i+1]);
+	}
+	context.closePath();
+}
+
+renderSpaceView();
+
+function timeoutTest() {
+	window.setInterval(renderSpaceView(), 1000);
+}
+
+</script>
+
+</html>
