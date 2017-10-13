@@ -5,4 +5,4 @@ Hacked together while I was waiting for the plane to take off from Keflavik Inte
 
 ![Screenshot of output](/Screen%20Shot%202016-11-09%20at%2000.10.30.png)
 
-<h1><a href="GalaxyCanvas.html">&gt;Link to demonstration&lt;</a></h1>
+<h1><a href="https://benwheatley.github.io/GalaxyCanvas.js/GalaxyCanvas.html">&gt;Link to demonstration&lt;</a></h1>
